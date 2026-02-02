@@ -11,7 +11,8 @@ const getApiBaseUrl = () => {
   if (!window.location?.hostname?.includes('localhost')) return BACKEND_URL;
   return process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
 };
-const API_BASE_URL = getApiBaseUrl();
+// Strip trailing slash so we never get //api/... (404)
+const API_BASE_URL = getApiBaseUrl().replace(/\/$/, '');
 
 // Log API configuration on load
 console.log('🌐 Web Dashboard API Configuration:');
@@ -61,14 +62,14 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
     }
   }
 
+  const url = path.startsWith('/') ? `${API_BASE_URL}${path}` : `${API_BASE_URL}/${path}`;
   console.log(`🌐 API Request: ${method} ${path}`);
-  console.log(`   Full URL: ${API_BASE_URL}${path}`);
+  console.log(`   Full URL: ${url}`);
   if (body) {
     console.log('📦 Request body:', body);
   }
-
   try {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
+    const res = await fetch(url, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
