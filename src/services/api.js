@@ -1,13 +1,15 @@
 // API Service for Web Dashboard
 // Same backend as mobile app - port 5001
 
-// Use env var if set; when deployed (not localhost) default to Render backend so Create Account works
+// Backend URL: never call same origin (Vercel) for API – it returns 404. Always use Render when deployed.
+const BACKEND_URL = 'https://village-work.onrender.com';
+
 const getApiBaseUrl = () => {
-  if (process.env.REACT_APP_API_BASE_URL) return process.env.REACT_APP_API_BASE_URL;
-  if (typeof window !== 'undefined' && window.location?.hostname && !window.location.hostname.includes('localhost')) {
-    return 'https://village-work.onrender.com';
-  }
-  return 'http://localhost:5001';
+  if (typeof window === 'undefined') return process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+  const origin = window.location?.origin || '';
+  // Deployed on Vercel or other host: use backend. Don’t use same origin (would 404).
+  if (!window.location?.hostname?.includes('localhost')) return BACKEND_URL;
+  return process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
 };
 const API_BASE_URL = getApiBaseUrl();
 
