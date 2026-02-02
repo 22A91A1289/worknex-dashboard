@@ -1,7 +1,15 @@
 // API Service for Web Dashboard
 // Same backend as mobile app - port 5001
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+// Use env var if set; when deployed (not localhost) default to Render backend so Create Account works
+const getApiBaseUrl = () => {
+  if (process.env.REACT_APP_API_BASE_URL) return process.env.REACT_APP_API_BASE_URL;
+  if (typeof window !== 'undefined' && window.location?.hostname && !window.location.hostname.includes('localhost')) {
+    return 'https://village-work.onrender.com';
+  }
+  return 'http://localhost:5001';
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // Log API configuration on load
 console.log('🌐 Web Dashboard API Configuration:');
