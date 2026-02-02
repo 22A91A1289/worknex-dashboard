@@ -9,10 +9,10 @@ const getApiBaseUrl = () => {
   const origin = window.location?.origin || '';
   // Deployed on Vercel or other host: use backend. Don’t use same origin (would 404).
   if (!window.location?.hostname?.includes('localhost')) return BACKEND_URL;
-  return process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+  const env = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+  return typeof env === 'string' ? env.replace(/\/+$/, '') : env;
 };
-// Strip trailing slash so we never get //api/... (404)
-const API_BASE_URL = getApiBaseUrl().replace(/\/+$/, '');
+const API_BASE_URL = getApiBaseUrl();
 
 // Log API configuration on load
 console.log('🌐 Web Dashboard API Configuration:');
@@ -20,7 +20,7 @@ console.log('  - API Base URL:', API_BASE_URL);
 console.log('  - Current Origin:', window.location.origin);
 
 function buildApiUrl(path) {
-  const base = API_BASE_URL.replace(/\/+$/, '');
+  const base = getApiBaseUrl().replace(/\/+$/, '');
   const p = path && path.startsWith('/') ? path : `/${path || ''}`;
   return `${base}${p}`;
 }
@@ -69,11 +69,7 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
   }
 
   const url = buildApiUrl(path);
-  console.log(`🌐 API Request: ${method} ${path}`);
-  console.log(`   Full URL: ${url}`);
-  if (body) {
-    console.log('📦 Request body:', body);
-  }
+  console.log(`🌐 API Request: ${method} ${path} → ${url}`);
   try {
     const res = await fetch(url, {
       method,
@@ -104,18 +100,7 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
     return data;
   } catch (error) {
     console.error(`❌ Fetch Error for ${method} ${path}:`, error);
-    console.error('   Error type:', error.name);
     console.error('   Error message:', error.message);
-    
-    // Check if it's a network error
-    if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
-      console.error('🚨 NETWORK ERROR - Possible causes:');
-      console.error('   1. Backend server not running');
-      console.error('   2. Wrong backend URL:', API_BASE_URL);
-      console.error('   3. CORS not configured for:', window.location.origin);
-      console.error('   4. Firewall blocking connection');
-    }
-    
     throw error;
   }
 }
