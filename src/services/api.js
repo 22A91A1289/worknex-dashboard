@@ -12,12 +12,18 @@ const getApiBaseUrl = () => {
   return process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
 };
 // Strip trailing slash so we never get //api/... (404)
-const API_BASE_URL = getApiBaseUrl().replace(/\/$/, '');
+const API_BASE_URL = getApiBaseUrl().replace(/\/+$/, '');
 
 // Log API configuration on load
 console.log('🌐 Web Dashboard API Configuration:');
 console.log('  - API Base URL:', API_BASE_URL);
 console.log('  - Current Origin:', window.location.origin);
+
+function buildApiUrl(path) {
+  const base = API_BASE_URL.replace(/\/+$/, '');
+  const p = path && path.startsWith('/') ? path : `/${path || ''}`;
+  return `${base}${p}`;
+}
 
 // Get auth token from localStorage
 function getAuthToken() {
@@ -62,7 +68,7 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
     }
   }
 
-  const url = path.startsWith('/') ? `${API_BASE_URL}${path}` : `${API_BASE_URL}/${path}`;
+  const url = buildApiUrl(path);
   console.log(`🌐 API Request: ${method} ${path}`);
   console.log(`   Full URL: ${url}`);
   if (body) {
