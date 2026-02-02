@@ -2,10 +2,13 @@
 // Same backend as mobile app - port 5001
 
 // Backend URL: never call same origin (Vercel) for API – it returns 404. Always use Render when deployed.
-const BACKEND_URL = 'https://village-work.onrender.com';
+const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
 
 const getApiBaseUrl = () => {
-  if (typeof window === 'undefined') return process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+  if (typeof window === 'undefined') {
+    const url = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+    return typeof url === 'string' ? url.replace(/\/+$/, '') : url;
+  }
   const origin = window.location?.origin || '';
   // Deployed on Vercel or other host: use backend. Don’t use same origin (would 404).
   if (!window.location?.hostname?.includes('localhost')) return BACKEND_URL;
@@ -20,8 +23,8 @@ console.log('  - API Base URL:', API_BASE_URL);
 console.log('  - Current Origin:', window.location.origin);
 
 function buildApiUrl(path) {
-  const base = getApiBaseUrl().replace(/\/+$/, '');
-  const p = path && path.startsWith('/') ? path : `/${path || ''}`;
+  const base = (getApiBaseUrl() || '').replace(/\/+$/, '');
+  const p = (path && path.startsWith('/') ? path : `/${path || ''}`).replace(/^\/+/, '/');
   return `${base}${p}`;
 }
 
