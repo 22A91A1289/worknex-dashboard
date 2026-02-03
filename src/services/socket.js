@@ -1,6 +1,8 @@
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://192.168.31.14:5000';
+// Same backend as API (Render). Override with REACT_APP_SOCKET_URL or REACT_APP_API_BASE_URL for local backend.
+const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_API_BASE_URL || BACKEND_URL;
 
 class SocketService {
   constructor() {
@@ -92,7 +94,9 @@ class SocketService {
 
   on(event, callback) {
     if (!this.socket) {
-      console.warn('Socket not connected. Call connect() first.');
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('Socket not connected yet. Call connect() first or wait for mount.');
+      }
       return;
     }
 

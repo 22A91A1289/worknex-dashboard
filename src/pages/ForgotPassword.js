@@ -11,10 +11,12 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (!email.trim()) {
       setError('Please enter your email');
@@ -26,6 +28,7 @@ const ForgotPassword = () => {
       await api.post('/api/auth/forgot-password', {
         email: email.trim().toLowerCase()
       });
+      setSuccess('OTP sent to your email. Check your inbox (and spam).');
       setStep(2);
     } catch (err) {
       setError(err?.message || 'Failed to send OTP');
@@ -37,9 +40,15 @@ const ForgotPassword = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (!otp.trim() || !newPassword.trim()) {
       setError('Please enter OTP and new password');
+      return;
+    }
+
+    if (newPassword.trim().length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
 
@@ -50,7 +59,7 @@ const ForgotPassword = () => {
         otp: otp.trim(),
         newPassword: newPassword.trim()
       });
-      navigate('/login', { replace: true });
+      navigate('/login', { replace: true, state: { passwordReset: true } });
     } catch (err) {
       setError(err?.message || 'Failed to reset password');
     } finally {
@@ -105,6 +114,7 @@ const ForgotPassword = () => {
             </>
           )}
 
+          {success && <div className="success">{success}</div>}
           {error && <div className="error">{error}</div>}
 
           <button type="submit" className="btn-primary" disabled={loading}>

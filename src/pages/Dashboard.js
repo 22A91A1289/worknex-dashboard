@@ -15,12 +15,14 @@ const Dashboard = () => {
   const [recentJobs, setRecentJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
+  const [connectionError, setConnectionError] = useState(null);
 
-  // Get user from localStorage
+  // Get user from localStorage (API returns id, not _id)
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
   
   // Connect to socket for real-time updates
-  const { on, off } = useSocket(user._id, 'owner');
+  const userId = user?.id || user?._id;
+  const { on, off } = useSocket(userId, 'owner');
 
   useEffect(() => {
     loadDashboardData();
@@ -80,19 +82,20 @@ const Dashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+      setConnectionError(null);
+
       // Load jobs and applications in parallel
       const [jobs, applications] = await Promise.all([
         api.get('/api/jobs/owner/my-jobs', { auth: true }),
         api.get('/api/applications/owner/all', { auth: true }).catch(() => [])
       ]);
-      
+
       if (jobs && Array.isArray(jobs)) {
         const activeJobs = jobs.filter(job => job.status === 'active');
-        
+
         // Use actual applications count from database (more accurate)
         const totalApplications = applications?.length || 0;
-        
+
         // Update stats
         setStats([
           { label: 'Active Jobs', value: activeJobs.length.toString(), icon: IoBriefcaseOutline, color: '#4F46E5' },
@@ -110,11 +113,12 @@ const Dashboard = () => {
           posted: job.createdAt ? getTimeAgo(new Date(job.createdAt)) : 'Recently',
           salary: job.salary,
         }));
-        
+
         setRecentJobs(transformedJobs);
       }
     } catch (error) {
       console.error('Error loading dashboard:', error);
+      setConnectionError(error?.message || 'Failed to load dashboard');
     } finally {
       setLoading(false);
     }
@@ -160,6 +164,41 @@ const Dashboard = () => {
         <h1>Dashboard</h1>
         <p>Welcome back! Here's what's happening with your jobs.</p>
       </div>
+
+      {connectionError && (
+        <div
+          style={{
+            background: '#FEF2F2',
+            border: '1px solid #FECACA',
+            color: '#B91C1C',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '8px'
+          }}
+        >
+          <span>{connectionError}</span>
+          <button
+            type="button"
+            onClick={() => loadDashboardData()}
+            style={{
+              background: '#B91C1C',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 600
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Stats Grid - Matching Mobile App */}
       <div className="stats-grid">

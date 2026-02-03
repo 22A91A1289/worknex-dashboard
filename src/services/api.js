@@ -1,19 +1,13 @@
 // API Service for Web Dashboard
-// Same backend as mobile app - port 5001
+// Backend is on Render. Local dashboard (localhost:3000) uses Render API by default.
 
-// Backend URL: never call same origin (Vercel) for API – it returns 404. Always use Render when deployed.
 const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
 
 const getApiBaseUrl = () => {
-  if (typeof window === 'undefined') {
-    const url = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
-    return typeof url === 'string' ? url.replace(/\/+$/, '') : url;
-  }
-  const origin = window.location?.origin || '';
-  // Deployed on Vercel or other host: use backend. Don’t use same origin (would 404).
-  if (!window.location?.hostname?.includes('localhost')) return BACKEND_URL;
-  const env = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
-  return typeof env === 'string' ? env.replace(/\/+$/, '') : env;
+  const env = process.env.REACT_APP_API_BASE_URL;
+  if (env && typeof env === 'string') return env.replace(/\/+$/, '');
+  // Default: use Render backend (for both local dev and deployed dashboard)
+  return BACKEND_URL;
 };
 const API_BASE_URL = getApiBaseUrl();
 
@@ -125,6 +119,11 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
     return data;
   } catch (error) {
     console.error(`❌ Fetch Error for ${method} ${path}:`, error.message);
+    // Friendly message when backend is not running or unreachable
+    if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+      const base = getApiBaseUrl();
+      throw new Error(`Cannot connect to server. Is the backend running at ${base}?`);
+    }
     throw error;
   }
 }

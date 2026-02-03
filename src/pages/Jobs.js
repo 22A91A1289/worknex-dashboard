@@ -20,11 +20,12 @@ const Jobs = () => {
     trainingProvided: false,
   });
 
-  // Get user from localStorage
+  // Get user from localStorage (API returns id, not _id)
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
+  const userId = user?.id || user?._id;
   
   // Connect to socket for real-time updates
-  const { on, off } = useSocket(user._id, 'owner');
+  const { on, off } = useSocket(userId, 'owner');
 
   useEffect(() => {
     loadJobs();

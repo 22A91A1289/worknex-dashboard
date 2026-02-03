@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import './Login.css';
 import { api, setAuth } from '../services/api';
 
 const Login = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (location.state?.passwordReset) {
+      setSuccessMessage('Password reset successfully. You can now log in.');
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,6 +84,11 @@ const Login = ({ setIsAuthenticated }) => {
               </Link>
             </div>
           </div>
+          {successMessage && (
+            <div className="success-message" style={{ color: '#059669', marginBottom: '16px', fontSize: '14px' }}>
+              {successMessage}
+            </div>
+          )}
           {error && (
             <div className="error-message" style={{ color: '#EF4444', marginBottom: '16px', fontSize: '14px' }}>
               {error}
