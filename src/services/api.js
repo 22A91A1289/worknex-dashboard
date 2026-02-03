@@ -17,10 +17,28 @@ const getApiBaseUrl = () => {
 };
 const API_BASE_URL = getApiBaseUrl();
 
-// Log API configuration on load
-console.log('🌐 Web Dashboard API Configuration:');
-console.log('  - API Base URL:', API_BASE_URL);
-console.log('  - Current Origin:', window.location.origin);
+const isDev = () => process.env.NODE_ENV === 'development';
+
+// Sensitive keys - never log these in request/response
+const SENSITIVE_KEYS = ['password', 'confirmPassword', 'token', 'accessToken', 'refreshToken', 'secret'];
+
+function redact(obj) {
+  if (obj == null || typeof obj !== 'object') return obj;
+  const out = Array.isArray(obj) ? [...obj] : { ...obj };
+  for (const key of Object.keys(out)) {
+    const k = key.toLowerCase();
+    if (SENSITIVE_KEYS.some((s) => k.includes(s.toLowerCase()))) out[key] = '[REDACTED]';
+    else if (typeof out[key] === 'object' && out[key] !== null) out[key] = redact(out[key]);
+  }
+  return out;
+}
+
+// Log API configuration on load (no credentials)
+if (isDev()) {
+  console.log('🌐 Web Dashboard API Configuration:');
+  console.log('  - API Base URL:', API_BASE_URL);
+  console.log('  - Current Origin:', typeof window !== 'undefined' ? window.location.origin : 'SSR');
+}
 
 function buildApiUrl(path) {
   const base = (getApiBaseUrl() || '').replace(/\/+$/, '');
@@ -65,14 +83,15 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
     const token = getAuthToken();
     if (token) {
       headers.Authorization = `Bearer ${token}`;
-      console.log(`🔑 Using auth token: ${token.substring(0, 20)}...`);
+      if (isDev()) console.log('🔑 Using auth token');
     } else {
-      console.warn('⚠️ Auth requested but no token found');
+      if (isDev()) console.warn('⚠️ Auth requested but no token found');
     }
   }
 
   const url = buildApiUrl(path);
-  console.log(`🌐 API Request: ${method} ${path} → ${url}`);
+  // Never log request body - it may contain password/credentials
+  if (isDev()) console.log(`🌐 API Request: ${method} ${path}`);
   try {
     const res = await fetch(url, {
       method,
@@ -80,7 +99,7 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    console.log(`📡 Response status: ${res.status} ${res.statusText}`);
+    if (isDev()) console.log(`📡 Response status: ${res.status} ${res.statusText}`);
 
     const text = await res.text();
     let data;
@@ -95,15 +114,17 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
         (data && typeof data === 'object' && (data.error || data.message)) ||
         `Request failed (${res.status})`;
       console.error(`❌ API Error: ${message}`);
-      console.error('Response data:', data);
+      if (isDev()) console.error('Response data:', redact(data));
       throw new Error(message);
     }
 
-    console.log(`✅ API Success:`, data);
+    // Never log full response for auth routes (contains token/user)
+    const isAuthRoute = /\/api\/auth\//i.test(path);
+    if (isDev() && !isAuthRoute) console.log('✅ API Success:', redact(data));
+    else if (isDev()) console.log('✅ API Success');
     return data;
   } catch (error) {
-    console.error(`❌ Fetch Error for ${method} ${path}:`, error);
-    console.error('   Error message:', error.message);
+    console.error(`❌ Fetch Error for ${method} ${path}:`, error.message);
     throw error;
   }
 }
