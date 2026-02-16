@@ -1,4 +1,4 @@
-// import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect, useCallback } from 'react';
 // import { 
 //   IoBriefcaseOutline, 
 //   IoPeopleOutline
@@ -279,7 +279,7 @@
 // };
 
 // export default Dashboard;
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   IoBriefcaseOutline,
   IoPeopleOutline
@@ -301,6 +301,64 @@ const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
   const userId = user?.id || user?._id;
   const { on, off } = useSocket(userId, 'owner');
+
+  const showNotification = useCallback((message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  }, []);
+
+  const getTimeAgo = (date) => {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return 'Just now';
+  };
+
+  const loadDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setConnectionError(null);
+
+      const [jobs, applications] = await Promise.all([
+        api.get('/api/jobs/owner/my-jobs', { auth: true }),
+        api.get('/api/applications/owner/all', { auth: true }).catch(() => [])
+      ]);
+
+      if (jobs && Array.isArray(jobs)) {
+        const activeJobs = jobs.filter(job => job.status === 'active');
+        const totalApplications = applications?.length || 0;
+
+        setStats([
+          { label: 'Active Jobs', value: activeJobs.length.toString(), icon: IoBriefcaseOutline, color: '#4F46E5' },
+          { label: 'Applications', value: totalApplications.toString(), icon: IoPeopleOutline, color: '#10B981' },
+        ]);
+
+        const transformedJobs = activeJobs.slice(0, 6).map(job => ({
+          id: job._id,
+          title: job.title,
+          category: job.category,
+          location: job.location,
+          applicants: applications?.filter(app => app.job?._id === job._id).length || 0,
+          status: job.status,
+          posted: job.createdAt ? getTimeAgo(new Date(job.createdAt)) : 'Recently',
+          salary: job.salary,
+        }));
+
+        setRecentJobs(transformedJobs);
+      }
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+      setConnectionError(error?.message || 'Failed to load dashboard');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadDashboardData();
@@ -341,65 +399,7 @@ const Dashboard = () => {
       off('application:new', handleNewApplication);
       off('application:updated', handleApplicationUpdated);
     };
-  }, []);
-
-  const showNotification = (message, type = 'info') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
-  };
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      setConnectionError(null);
-
-      const [jobs, applications] = await Promise.all([
-        api.get('/api/jobs/owner/my-jobs', { auth: true }),
-        api.get('/api/applications/owner/all', { auth: true }).catch(() => [])
-      ]);
-
-      if (jobs && Array.isArray(jobs)) {
-        const activeJobs = jobs.filter(job => job.status === 'active');
-        const totalApplications = applications?.length || 0;
-
-        setStats([
-          { label: 'Active Jobs', value: activeJobs.length.toString(), icon: IoBriefcaseOutline, color: '#4F46E5' },
-          { label: 'Applications', value: totalApplications.toString(), icon: IoPeopleOutline, color: '#10B981' },
-        ]);
-
-        const transformedJobs = activeJobs.slice(0, 6).map(job => ({
-          id: job._id,
-          title: job.title,
-          category: job.category,
-          location: job.location,
-          applicants: applications?.filter(app => app.job?._id === job._id).length || 0,
-          status: job.status,
-          posted: job.createdAt ? getTimeAgo(new Date(job.createdAt)) : 'Recently',
-          salary: job.salary,
-        }));
-
-        setRecentJobs(transformedJobs);
-      }
-    } catch (error) {
-      console.error('Error loading dashboard:', error);
-      setConnectionError(error?.message || 'Failed to load dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getTimeAgo = (date) => {
-    const now = new Date();
-    const diff = now - date;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    return 'Just now';
-  };
+  }, [loadDashboardData, showNotification, on, off]);
 
   return (
     <div className="dashboard">
