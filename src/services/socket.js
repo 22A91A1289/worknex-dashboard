@@ -4,14 +4,40 @@ import { getApiBaseUrl } from './api';
 // Same backend as API. Use REACT_APP_SOCKET_URL to override, otherwise shares API base URL.
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || getApiBaseUrl();
 
+// Check if Socket.IO is enabled (Vercel doesn't support WebSockets)
+const isSocketEnabled = () => {
+  // If REACT_APP_SOCKET_URL is explicitly set, use it
+  if (process.env.REACT_APP_SOCKET_URL) {
+    return true;
+  }
+  // If running against Vercel (production), disable Socket.IO
+  if (SOCKET_URL.includes('vercel.app') && !process.env.REACT_APP_API_BASE_URL) {
+    return false;
+  }
+  // Enable for local development or custom backends
+  return true;
+};
+
 class SocketService {
   constructor() {
     this.socket = null;
     this.listeners = new Map();
+    this.enabled = isSocketEnabled();
+    
+    if (!this.enabled) {
+      console.log('⚠️ Socket.IO is disabled (Vercel serverless doesn\'t support WebSockets)');
+    }
   }
 
   connect(userId, role = 'owner') {
     if (!userId) return;
+
+    if (!this.enabled) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Socket.IO is disabled. Set REACT_APP_SOCKET_URL to enable for local backend.');
+      }
+      return;
+    }
 
     if (this.socket?.connected) {
       console.log('Socket already connected');
@@ -95,9 +121,9 @@ class SocketService {
   }
 
   on(event, callback) {
-    if (!this.socket) {
+    if (!this.enabled || !this.socket) {
       if (process.env.NODE_ENV === 'development') {
-        console.debug('Socket not connected yet. Call connect() first or wait for mount.');
+        console.debug('Socket not available. Socket.IO is disabled or not connected.');
       }
       return;
     }
@@ -112,7 +138,7 @@ class SocketService {
   }
 
   off(event, callback) {
-    if (!this.socket) return;
+    if (!this.enabled || !this.socket) return;
 
     if (callback) {
       this.socket.off(event, callback);
@@ -133,6 +159,13 @@ class SocketService {
   }
 
   emit(event, data) {
+    if (!this.enabled) {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('Socket.IO is disabled. Cannot emit event:', event);
+      }
+      return;
+    }
+
     if (!this.socket?.connected) {
       console.warn('Socket not connected. Cannot emit event:', event);
       return;
@@ -158,7 +191,11 @@ class SocketService {
   }
 
   isConnected() {
-    return this.socket?.connected || false;
+    return this.enabled && (this.socket?.connected || false);
+  }
+
+  isEnabled() {
+    return this.enabled;
   }
 }
 

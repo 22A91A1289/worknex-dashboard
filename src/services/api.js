@@ -1,12 +1,12 @@
 // API Service for Web Dashboard
-// Backend is on Render. Local dashboard (localhost:3000) uses Render API by default.
+// Backend is on Vercel. Local dashboard (localhost:3000) uses Vercel API by default.
 
-const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
+const BACKEND_URL = 'https://village-work.vercel.app'.replace(/\/+$/, '');
 
 export const getApiBaseUrl = () => {
   const env = process.env.REACT_APP_API_BASE_URL;
   if (env && typeof env === 'string') return env.replace(/\/+$/, '');
-  // Default: use Render backend (for both local dev and deployed dashboard)
+  // Default: use Vercel backend (for both local dev and deployed dashboard)
   return BACKEND_URL;
 };
 const API_BASE_URL = getApiBaseUrl();
