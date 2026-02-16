@@ -12,6 +12,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [otpFromServer, setOtpFromServer] = useState(''); // OTP shown on screen when email not sent
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -25,10 +26,17 @@ const ForgotPassword = () => {
 
     try {
       setLoading(true);
-      await api.post('/api/auth/forgot-password', {
+      const data = await api.post('/api/auth/forgot-password', {
         email: email.trim().toLowerCase()
       });
-      setSuccess('OTP sent to your email. Check your inbox (and spam).');
+      if (data?.otp) {
+        setOtp(data.otp);
+        setOtpFromServer(data.otp);
+        setSuccess(data.message || 'Email not configured. Use the OTP below.');
+      } else {
+        setOtpFromServer('');
+        setSuccess('OTP sent to your email. Check your inbox (and spam).');
+      }
       setStep(2);
     } catch (err) {
       setError(err?.message || 'Failed to send OTP');
@@ -90,6 +98,25 @@ const ForgotPassword = () => {
 
           {step === 2 && (
             <>
+              {otpFromServer && (
+                <div
+                  className="otp-display"
+                  style={{
+                    background: '#ECFDF5',
+                    border: '1px solid #10B981',
+                    color: '#065F46',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    letterSpacing: '4px'
+                  }}
+                >
+                  Your OTP: {otpFromServer}
+                </div>
+              )}
               <div className="form-group">
                 <label>OTP</label>
                 <input

@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
-// Same backend as API (Render). Override with REACT_APP_SOCKET_URL or REACT_APP_API_BASE_URL for local backend.
-const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
+// Same backend as API (Vercel). Override with REACT_APP_SOCKET_URL or REACT_APP_API_BASE_URL for local backend.
+const BACKEND_URL = 'https://village-work.vercel.app'.replace(/\/+$/, '');
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_API_BASE_URL || BACKEND_URL;
 
 class SocketService {
