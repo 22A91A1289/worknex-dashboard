@@ -61,7 +61,11 @@ const ForgotPassword = () => {
       });
       navigate('/login', { replace: true, state: { passwordReset: true } });
     } catch (err) {
-      setError(err?.message || 'Failed to reset password');
+      const msg = err?.message || 'Failed to reset password';
+      const isInvalidOtp = /invalid otp|otp expired|wrong otp/i.test(msg);
+      setError(isInvalidOtp
+        ? 'Invalid or expired OTP. Please request a new code using "Resend OTP" below.'
+        : msg);
     } finally {
       setLoading(false);
     }

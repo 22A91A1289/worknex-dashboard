@@ -1,8 +1,8 @@
 import { io } from 'socket.io-client';
+import { getApiBaseUrl } from './api';
 
-// Same backend as API (Render). Override with REACT_APP_SOCKET_URL or REACT_APP_API_BASE_URL for local backend.
-const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_API_BASE_URL || BACKEND_URL;
+// Same backend as API. Use REACT_APP_SOCKET_URL to override, otherwise shares API base URL.
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || getApiBaseUrl();
 
 class SocketService {
   constructor() {
@@ -11,6 +11,8 @@ class SocketService {
   }
 
   connect(userId, role = 'owner') {
+    if (!userId) return;
+
     if (this.socket?.connected) {
       console.log('Socket already connected');
       return;

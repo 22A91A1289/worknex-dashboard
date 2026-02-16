@@ -12,6 +12,7 @@ import {
 } from 'react-icons/io5';
 import './Layout.css';
 import { clearAuth } from '../services/api';
+import socketService from '../services/socket';
 
 const Layout = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleLogout = () => {
+    socketService.disconnect();
     clearAuth();
     window.dispatchEvent(new Event('authChange'));
     navigate('/login');

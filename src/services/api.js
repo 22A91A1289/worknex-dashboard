@@ -3,7 +3,7 @@
 
 const BACKEND_URL = 'https://village-work.onrender.com'.replace(/\/+$/, '');
 
-const getApiBaseUrl = () => {
+export const getApiBaseUrl = () => {
   const env = process.env.REACT_APP_API_BASE_URL;
   if (env && typeof env === 'string') return env.replace(/\/+$/, '');
   // Default: use Render backend (for both local dev and deployed dashboard)
