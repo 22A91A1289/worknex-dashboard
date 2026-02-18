@@ -9,10 +9,10 @@ import {
   IoCheckmarkCircle
 } from 'react-icons/io5';
 import '../Payments/Payments.scss';
-import { api } from '../../../services/api';
-import Button from '../../../components/ui/Button';
-import Toast from '../../../components/ui/Toast';
-import Loader from '../../../components/ui/Loader';
+import { api } from '../../services/api';
+import Button from '../../components/ui/Button';
+import Toast from '../../components/ui/Toast';
+import Loader from '../../components/ui/Loader';
 
 const PaymentProcess = () => {
   const { id } = useParams();

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoArrowBackOutline } from 'react-icons/io5';
-import '../Jobs.scss';
-import { api } from '../../../services/api';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import Toast from '../../../components/ui/Toast';
+import './Jobs.scss';
+import { api } from '../../services/api';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Toast from '../../components/ui/Toast';
 
 const CreateJob = () => {
   const navigate = useNavigate();

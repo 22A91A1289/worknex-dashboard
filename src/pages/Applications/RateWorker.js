@@ -6,10 +6,10 @@ import {
   IoStarOutline 
 } from 'react-icons/io5';
 import '../Applications/Applications.scss';
-import { api } from '../../../services/api';
-import Button from '../../../components/ui/Button';
-import Toast from '../../../components/ui/Toast';
-import Loader from '../../../components/ui/Loader';
+import { api } from '../../services/api';
+import Button from '../../components/ui/Button';
+import Toast from '../../components/ui/Toast';
+import Loader from '../../components/ui/Loader';
 
 const RateWorker = () => {
   const { id } = useParams();
