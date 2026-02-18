@@ -1,4 +1,4 @@
-@import '../styles/variables';
+@import "../../styles/variables";
 
 .page-container {
   padding: $spacing-xl;
@@ -22,7 +22,8 @@
   }
 }
 
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   text-align: center;
   padding: 4rem;
   color: $text-muted;
@@ -72,6 +73,10 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
