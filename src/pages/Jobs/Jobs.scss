@@ -1,0 +1,77 @@
+@import '../styles/variables';
+
+.page-container {
+  padding: $spacing-xl;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .page-subtitle {
+    color: $text-muted;
+    font-size: 0.875rem;
+  }
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 4rem;
+  color: $text-muted;
+}
+
+.job-title-cell {
+  font-weight: 500;
+}
+
+.salary-cell {
+  color: $primary-color;
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.btn-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.btn-danger {
+  color: $error-color;
+  border-color: rgba($error-color, 0.2);
+  &:hover {
+    background-color: rgba($error-color, 0.05);
+  }
+}
+
+.modal-card {
+  &.modal-medium {
+    max-width: 600px;
+  }
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: $text-light;
+  &:hover {
+    color: $text-main;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

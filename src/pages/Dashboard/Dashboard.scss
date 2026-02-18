@@ -1,0 +1,72 @@
+@import "../../styles/variables";
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  transition: transform 0.2s ease-out;
+
+  @include mobile {
+    padding: $spacing-md;
+    gap: $spacing-md;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  .stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: $text-muted;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-main;
+      line-height: 1;
+    }
+  }
+}
+
+.dashboard-table-card {
+  .job-title-cell {
+    .title {
+      font-weight: 600;
+      color: $text-main;
+    }
+    .category {
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+
+  .salary-cell {
+    color: $primary-color;
+    font-weight: 600;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

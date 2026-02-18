@@ -1,0 +1,70 @@
+@import "../../styles/variables";
+
+.form-group {
+  margin-bottom: $spacing-lg;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: $spacing-sm;
+    color: $text-main;
+  }
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background-color: $bg-color;
+  font-size: 0.875rem;
+  color: $text-main;
+  transition: $transition-base;
+  font-family: $font-primary;
+  outline: none;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-light;
+  }
+
+  &:disabled {
+    background-color: $bg-light;
+    cursor: not-allowed;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: $text-muted;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    color: $text-main;
+  }
+}
+
+.input-error-message {
+  color: $error-color;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}

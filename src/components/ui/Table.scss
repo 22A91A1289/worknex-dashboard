@@ -1,0 +1,42 @@
+@import "../../styles/variables";
+
+.table-container {
+  width: 100%;
+  background: $bg-color;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  overflow: hidden;
+  margin-top: $spacing-lg;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th {
+    background-color: $bg-light;
+    padding: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+    border-bottom: 1px solid $border-color;
+  }
+
+  td {
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: $text-main;
+    border-bottom: 1px solid $border-color;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover {
+    background-color: rgba($bg-light, 0.5);
+  }
+}

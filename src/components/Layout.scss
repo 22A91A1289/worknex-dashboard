@@ -1,0 +1,204 @@
+@import "../styles/variables";
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: $bg-light;
+}
+
+.mobile-header {
+  height: 64px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $spacing-lg;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  color: white;
+
+  .logo {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  .menu-toggle {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+}
+
+.sidebar {
+  width: 260px;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+
+  &.closed {
+    width: 80px;
+
+    .sidebar-header h2 {
+      display: none;
+    }
+    .nav-label {
+      display: none;
+    }
+  }
+
+  @include mobile {
+    transform: translateX(-100%);
+    width: 260px !important; // Fixed width for mobile drawer
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-header {
+    padding: $spacing-xl $spacing-lg;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    &.mobile-only {
+      padding: $spacing-lg;
+    }
+
+    h2 {
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    .sidebar-toggle {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 0.5rem;
+      border-radius: $radius-md;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: $transition-base;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: $spacing-lg $spacing-md;
+    overflow-y: auto;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 0.875rem 1rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: none;
+      border-radius: $radius-md;
+      margin-bottom: 0.5rem;
+      transition: $transition-base;
+
+      .nav-icon {
+        font-size: 1.25rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+      }
+
+      .nav-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      &:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      &.active {
+        color: white;
+        background: $primary-color;
+        box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding: $spacing-lg;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    .logout-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: $radius-md;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition-base;
+
+      .logout-icon {
+        margin-right: 0.5rem;
+      }
+      &:hover {
+        background: rgba($error-color, 0.2);
+        color: $error-color;
+      }
+    }
+  }
+}
+
+.main-content {
+  flex: 1;
+  padding: $spacing-xl;
+  min-height: 100vh;
+  margin-left: 80px; // Default when sidebar is closed
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.shifted {
+    margin-left: 260px;
+  }
+
+  @include mobile {
+    margin-left: 0 !important;
+    padding-top: 80px; // Space for mobile header
+    padding-left: $spacing-md;
+    padding-right: $spacing-md;
+  }
+}

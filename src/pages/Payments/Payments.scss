@@ -1,0 +1,143 @@
+@import "../../styles/variables";
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+
+  @include mobile {
+    gap: $spacing-md;
+    padding: $spacing-md;
+  }
+
+  .stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &.warning {
+      background-color: rgba($warning-color, 0.1);
+      color: $warning-color;
+    }
+    &.success {
+      background-color: rgba($success-color, 0.1);
+      color: $success-color;
+    }
+    &.info {
+      background-color: rgba($info-color, 0.1);
+      color: $info-color;
+    }
+  }
+
+  .stat-info {
+    .stat-label {
+      font-size: 0.875rem;
+      color: $text-muted;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-main;
+      line-height: 1.2;
+    }
+    .stat-count {
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.filter-actions {
+  margin-bottom: $spacing-lg;
+  padding: $spacing-sm;
+
+  .tabs {
+    display: flex;
+    gap: $spacing-sm;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab {
+      padding: 0.5rem 1rem;
+      border-radius: $radius-md;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: $text-muted;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: $transition-base;
+      white-space: nowrap;
+
+      &:hover {
+        color: $text-main;
+        background: $bg-light;
+      }
+      &.active {
+        color: $primary-color;
+        background: rgba($primary-color, 0.1);
+      }
+    }
+  }
+}
+
+.worker-cell,
+.job-cell {
+  .name,
+  .title {
+    font-weight: 600;
+    color: $text-main;
+  }
+  .phone,
+  .category {
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+}
+
+.amount-cell {
+  font-weight: 700;
+  color: $text-main;
+}
+
+.payment-form {
+  .method-selector {
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: $spacing-sm;
+
+      @include mobile {
+        grid-template-columns: 1fr;
+      }
+
+      .method-btn {
+        padding: $spacing-md;
+        border: 1px solid $border-color;
+        border-radius: $radius-md;
+        background: $bg-color;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-xs;
+        font-size: 0.875rem;
+        transition: $transition-base;
+
+        &.active {
+          border-color: $primary-color;
+          background: rgba($primary-color, 0.05);
+          color: $primary-color;
+        }
+      }
+    }
+  }
+}

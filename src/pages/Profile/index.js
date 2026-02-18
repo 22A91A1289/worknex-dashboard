@@ -9,8 +9,8 @@ import {
   IoLocationOutline,
   IoRefreshOutline
 } from 'react-icons/io5';
-import './Profile.css';
-import { api } from '../services/api';
+import './Profile.scss';
+import { api } from '../../services/api';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({

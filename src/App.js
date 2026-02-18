@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
+import './App.scss';
 import Dashboard from './pages/Dashboard';
 import Jobs from './pages/Jobs';
 import Applications from './pages/Applications';

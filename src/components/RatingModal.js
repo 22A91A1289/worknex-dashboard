@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { IoStar, IoStarOutline, IoClose } from 'react-icons/io5';
-import './RatingModal.css';
+import './RatingModal.scss';
 import { api } from '../services/api';
+import Button from './ui/Button';
 
 const RatingModal = ({ isOpen, onClose, application }) => {
   const [rating, setRating] = useState(0);
@@ -22,27 +23,15 @@ const RatingModal = ({ isOpen, onClose, application }) => {
     try {
       setSubmitting(true);
       
-      // Handle both transformed and original application structure
       const ratedUserId = application.applicantId || application.applicant?._id;
       const applicationId = application.id || application._id;
       const jobId = application.jobId || application.job?._id;
       
-      console.log('⭐ Submitting rating:', {
-        ratedUserId,
-        rating,
-        review,
-        applicationId
-      });
-
-      if (!ratedUserId) {
-        throw new Error('Worker ID not found in application data');
+      if (!ratedUserId || !applicationId) {
+        throw new Error('Required IDs not found in application data');
       }
 
-      if (!applicationId) {
-        throw new Error('Application ID not found');
-      }
-
-      const response = await api.post('/api/ratings', {
+      await api.post('/api/ratings', {
         ratedUserId,
         rating,
         review: review.trim(),
@@ -50,14 +39,10 @@ const RatingModal = ({ isOpen, onClose, application }) => {
         jobId
       }, { auth: true });
 
-      console.log('✅ Rating submitted:', response);
-
       alert('Thank you for your feedback!');
-      
-      // Reset and close
       setRating(0);
       setReview('');
-      onClose(true); // Pass true to indicate success
+      onClose(true);
 
     } catch (error) {
       console.error('❌ Rating submission error:', error);
@@ -75,91 +60,76 @@ const RatingModal = ({ isOpen, onClose, application }) => {
       case 3: return 'Good';
       case 4: return 'Very Good';
       case 5: return 'Excellent';
-      default: return 'Click to rate';
+      default: return 'Rate your experience';
     }
   };
 
-  // Handle both transformed and original application structure
   const workerName = application.worker || application.applicant?.name || 'this worker';
   const jobTitle = application.job || application.job?.title;
 
   return (
-    <div className="rating-modal-overlay" onClick={onClose}>
-      <div className="rating-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="rating-modal-close" onClick={onClose}>
+    <div className="modal-overlay rating-modal" onClick={onClose}>
+      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close-btn" onClick={onClose}>
           <IoClose size={24} />
         </button>
 
-        <div className="rating-modal-header">
-          <div className="rating-modal-icon">
-            <IoStar size={40} color="#FFD700" />
+        <div className="modal-header" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div className="rating-icon-box">
+            <IoStar size={40} />
           </div>
-          <h2>Rate Worker</h2>
-          <p>How was your experience with {workerName}?</p>
-          {jobTitle && (
-            <p className="rating-modal-job">Job: {jobTitle}</p>
-          )}
+          <h2 className="modal-title">Rate Worker</h2>
+          <p className="modal-message">How was your experience with {workerName}?</p>
+          {jobTitle && <p className="job-label">Job: {jobTitle}</p>}
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Star Rating */}
-          <div className="rating-stars-container">
+          <div className="stars-wrapper">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
-                className="rating-star-button"
+                className="star-btn"
                 onMouseEnter={() => setHoveredRating(star)}
                 onMouseLeave={() => setHoveredRating(0)}
                 onClick={() => setRating(star)}
               >
                 {star <= (hoveredRating || rating) ? (
-                  <IoStar size={48} color="#FFD700" />
+                  <IoStar size={44} color="#F59E0B" />
                 ) : (
-                  <IoStarOutline size={48} color="#D1D5DB" />
+                  <IoStarOutline size={44} color="#D1D5DB" />
                 )}
               </button>
             ))}
           </div>
 
-          {/* Rating Text */}
-          <div className={`rating-text ${(hoveredRating || rating) > 0 ? 'active' : ''}`}>
+          <div className={`rating-status ${(hoveredRating || rating) > 0 ? 'active' : ''}`}>
             {getRatingText()}
           </div>
 
-          {/* Review Input */}
-          <div className="rating-review-section">
-            <label htmlFor="review">Write a review (optional)</label>
+          <div className="form-group">
+            <label className="form-label">Review (Optional)</label>
             <textarea
-              id="review"
-              placeholder="Share your experience..."
+              className="input-field"
+              placeholder="Tell us about the worker's performance..."
               value={review}
               onChange={(e) => setReview(e.target.value)}
               maxLength={500}
               rows={4}
+              style={{ minHeight: '100px', resize: 'vertical' }}
             />
-            <div className="rating-char-count">
-              {review.length}/500 characters
-            </div>
+            <div className="char-count">{review.length}/500</div>
           </div>
 
-          {/* Buttons */}
-          <div className="rating-modal-actions">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-              disabled={submitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
+          <div className="modal-actions" style={{ marginTop: '2rem' }}>
+            <Button variant="secondary" type="button" onClick={onClose} disabled={submitting}>Cancel</Button>
+            <Button 
+              variant="primary" 
+              type="submit" 
               disabled={rating === 0 || submitting}
             >
               {submitting ? 'Submitting...' : 'Submit Rating'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -168,3 +138,4 @@ const RatingModal = ({ isOpen, onClose, application }) => {
 };
 
 export default RatingModal;
+

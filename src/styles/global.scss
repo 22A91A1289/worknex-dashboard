@@ -1,0 +1,175 @@
+@import "variables";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-primary;
+  background-color: $bg-light;
+  color: $text-main;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: $font-primary;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font-family: $font-primary;
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  color: $text-main;
+}
+
+// Card Components
+.card {
+  background: $bg-color;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+// Badge Components
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: $radius-full;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+
+  &.badge-success {
+    background-color: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+
+  &.badge-error {
+    background-color: rgba($error-color, 0.1);
+    color: $error-color;
+  }
+
+  &.badge-warning {
+    background-color: rgba($warning-color, 0.1);
+    color: $warning-color;
+  }
+
+  &.badge-info {
+    background-color: rgba($info-color, 0.1);
+    color: $info-color;
+  }
+}
+
+// Layout Utilities
+.page-container {
+  padding: $spacing-xl;
+  max-width: 1600px;
+  margin: 0 auto;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  gap: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: $spacing-lg;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .page-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+
+    @include mobile {
+      font-size: 1.5rem;
+    }
+  }
+
+  .page-subtitle {
+    color: $text-muted;
+    font-size: 0.875rem;
+  }
+}
+
+// Grid Utilities
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+}
+
+// Table Utilities
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    min-width: 800px;
+
+    @include mobile {
+      min-width: 600px;
+    }
+  }
+}
+
+// Modal Responsiveness
+.modal-overlay {
+  padding: $spacing-md;
+
+  .modal-card {
+    width: 100%;
+
+    &.modal-medium {
+      max-width: 600px;
+    }
+
+    &.modal-large {
+      max-width: 800px;
+    }
+
+    @include mobile {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+  }
+}
