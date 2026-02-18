@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IoCallOutline, IoPersonOutline, IoStarOutline } from 'react-icons/io5';
 import './Applications.scss';
 import { api } from '../../services/api';
-import RatingModal from '../../components/RatingModal';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
+import Loader from '../../components/ui/Loader';
 
 const Applications = () => {
+  const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState(null);
   const [applications, setApplications] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [ratingModalOpen, setRatingModalOpen] = useState(false);
-  const [selectedApplicationForRating, setSelectedApplicationForRating] = useState(null);
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
@@ -49,7 +49,6 @@ const Applications = () => {
             applied: app.appliedAt || app.createdAt,
             skills: uniqueSkills,
             applicantId: app.applicant?._id,
-            videoUrl: app.applicant?.videoUrl || null,
             videoUploaded: app.applicant?.videoUploaded || false
           };
         });
@@ -69,7 +68,7 @@ const Applications = () => {
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      setNotification({ message: `Failed to load applications: ${error.message}`, type: 'error' });
+      setNotification({ message: `Failed to load applications`, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -92,7 +91,7 @@ const Applications = () => {
       setNotification({ message: `Application ${newStatus === 'accepted' ? 'accepted' : 'rejected'} successfully!`, type: 'success' });
     } catch (error) {
       console.error('Error updating status:', error);
-      setNotification({ message: `Failed to update: ${error.message}`, type: 'error' });
+      setNotification({ message: `Failed to update status`, type: 'error' });
     }
   };
 
@@ -103,9 +102,7 @@ const Applications = () => {
   if (loading) {
     return (
       <div className="applications-page page-container">
-        <div className="loading-state">
-          <p>Loading applications...</p>
-        </div>
+        <Loader message="Loading applications..." />
       </div>
     );
   }
@@ -202,7 +199,7 @@ const Applications = () => {
                   </>
                 )}
                 {(app.status.toLowerCase() === 'accepted' || app.status.toLowerCase() === 'completed') && (
-                  <Button variant="outline" className="btn-small" onClick={() => { setSelectedApplicationForRating(app); setRatingModalOpen(true); }}>
+                  <Button variant="outline" className="btn-small" onClick={() => navigate(`/applications/rate/${app.id}`)}>
                     <IoStarOutline size={14} /> Rate
                   </Button>
                 )}
@@ -218,16 +215,6 @@ const Applications = () => {
           <p>When workers apply, they will appear here.</p>
         </div>
       )}
-      
-      <RatingModal
-        isOpen={ratingModalOpen}
-        onClose={(success) => {
-          setRatingModalOpen(false);
-          setSelectedApplicationForRating(null);
-          if (success) loadData();
-        }}
-        application={selectedApplicationForRating}
-      />
     </div>
   );
 };

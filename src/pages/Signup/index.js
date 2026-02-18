@@ -91,65 +91,67 @@ const Signup = ({ setIsAuthenticated }) => {
           />
         </div>
       )}
-      <div className="login-card">
+      <div className="login-card signup-card">
         <div className="login-header">
           <h1 style={{ letterSpacing: '-0.025em', marginBottom: '0.25rem' }}>WORKNEX</h1>
           <p style={{ color: '#6B7280', fontSize: '0.975rem' }}>Create Employer Account</p>
         </div>
-        <form onSubmit={handleSubmit} className="login-form">
-          <Input
-            label="Full Name"
-            type="text"
-            value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="Enter your full name"
-            required
-          />
+        <form onSubmit={handleSubmit} className="login-form signup-form">
+          <div className="form-grid">
+            <Input
+              label="Full Name"
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="Enter your full name"
+              required
+            />
 
-          <Input
-            label="Email Address"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            placeholder="employer@worknex.com"
-            required
-          />
+            <Input
+              label="Email Address"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              placeholder="employer@worknex.com"
+              required
+            />
 
-          <Input
-            label="Phone Number"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
-            placeholder="+91 9876543210"
-            required
-          />
+            <Input
+              label="Phone Number"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+              placeholder="+91 9876543210"
+              required
+            />
 
-          <Input
-            label="Location"
-            type="text"
-            value={formData.location}
-            onChange={(e) => handleInputChange('location', e.target.value)}
-            placeholder="e.g., Srikakulam, Andhra Pradesh"
-            required
-          />
+            <Input
+              label="Location"
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              placeholder="e.g., Srikakulam, Andhra Pradesh"
+              required
+            />
 
-          <Input
-            label="Password"
-            type="password"
-            value={formData.password}
-            onChange={(e) => handleInputChange('password', e.target.value)}
-            placeholder="Min 6 characters"
-            required
-          />
+            <Input
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              placeholder="Min 6 characters"
+              required
+            />
 
-          <Input
-            label="Confirm Password"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-            placeholder="Re-enter password"
-            required
-          />
+            <Input
+              label="Confirm Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+              placeholder="Re-enter password"
+              required
+            />
+          </div>
 
           <Button 
             type="submit" 

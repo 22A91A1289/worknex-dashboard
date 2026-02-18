@@ -1,31 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { IoAddOutline, IoCloseOutline } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
+import { IoAddOutline } from 'react-icons/io5';
 import './Jobs.scss';
 import { api } from '../../services/api';
 import { useSocket } from '../../hooks/useSocket';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
 import Table from '../../components/ui/Table';
 import Toast from '../../components/ui/Toast';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import Loader from '../../components/ui/Loader';
 
 const Jobs = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
   const [notification, setNotification] = useState(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    category: 'Construction',
-    type: 'Daily Work',
-    location: '',
-    salary: '',
-    description: '',
-    experienceLevel: 'beginner',
-    trainingProvided: false,
-  });
 
   const user = JSON.parse(localStorage.getItem('authUser') || '{}');
   const userId = user?.id || user?._id;
@@ -34,35 +25,27 @@ const Jobs = () => {
   useEffect(() => {
     loadJobs();
     
-    const handleJobCreated = (data) => {
+    const handleJobCreated = () => {
       showNotification('New job posted successfully!', 'success');
       loadJobs();
     };
 
-    const handleJobUpdated = (data) => {
-      loadJobs();
-    };
-
-    const handleJobDeleted = (data) => {
+    on('job:created', handleJobCreated);
+    on('job:updated', loadJobs);
+    on('job:deleted', () => {
       showNotification('Job deleted successfully!', 'info');
       loadJobs();
-    };
-
-    const handleNewApplication = (data) => {
+    });
+    on('application:new', (data) => {
       showNotification(`New application received for ${data.application.job?.title}!`, 'success');
       loadJobs();
-    };
-
-    on('job:created', handleJobCreated);
-    on('job:updated', handleJobUpdated);
-    on('job:deleted', handleJobDeleted);
-    on('application:new', handleNewApplication);
+    });
 
     return () => {
       off('job:created', handleJobCreated);
-      off('job:updated', handleJobUpdated);
-      off('job:deleted', handleJobDeleted);
-      off('application:new', handleNewApplication);
+      off('job:updated', loadJobs);
+      off('job:deleted');
+      off('application:new');
     };
   }, [on, off]);
 
@@ -86,9 +69,6 @@ const Jobs = () => {
           applicants: job.applicants?.length || 0,
           status: job.status || 'active',
           posted: job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently',
-          description: job.description,
-          experienceLevel: job.experienceLevel,
-          trainingProvided: job.trainingProvided,
         }));
         setJobs(transformedJobs);
       }
@@ -97,49 +77,6 @@ const Jobs = () => {
       setJobs([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleCreateJob = async () => {
-    if (!formData.title || !formData.location || !formData.salary) {
-      showNotification('Please fill all required fields', 'error');
-      return;
-    }
-
-    try {
-      const jobData = {
-        title: formData.title,
-        category: formData.category,
-        type: formData.type,
-        location: formData.location,
-        salary: formData.salary,
-        description: formData.description || '',
-        experienceLevel: formData.experienceLevel,
-        trainingProvided: formData.trainingProvided,
-      };
-
-      await api.post('/api/jobs', jobData, { auth: true });
-      await loadJobs();
-      
-      setShowCreateModal(false);
-      setFormData({
-        title: '',
-        category: 'Construction',
-        type: 'Daily Work',
-        location: '',
-        salary: '',
-        description: '',
-        experienceLevel: 'beginner',
-        trainingProvided: false,
-      });
-      showNotification('Job posted successfully!', 'success');
-    } catch (error) {
-      console.error('Error creating job:', error);
-      showNotification('Failed to create job: ' + (error?.message || 'Please try again'), 'error');
     }
   };
 
@@ -156,7 +93,7 @@ const Jobs = () => {
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting job:', error);
-      showNotification('Failed to delete job: ' + (error?.message || 'Please try again'), 'error');
+      showNotification('Failed to delete job', 'error');
     }
   };
 
@@ -179,16 +116,14 @@ const Jobs = () => {
           <h1 className="page-title">Job Management</h1>
           <p className="page-subtitle">Create and manage your job postings easily.</p>
         </div>
-        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+        <Button variant="primary" onClick={() => navigate('/jobs/create')}>
           <IoAddOutline size={20} />
           Create New Job
         </Button>
       </div>
 
       {loading ? (
-        <div className="card loading-state">
-          <p>Loading jobs...</p>
-        </div>
+        <Loader message="Loading jobs..." />
       ) : jobs.length === 0 ? (
         <div className="card empty-state">
           <p>No jobs posted yet. Create your first job to get started!</p>
@@ -216,7 +151,7 @@ const Jobs = () => {
                   <Button 
                     variant="outline" 
                     className="btn-small"
-                    onClick={() => { window.location.href = `/applications?jobId=${job.id}`; }}
+                    onClick={() => navigate(`/applications?jobId=${job.id}`)}
                   >
                     View
                   </Button>
@@ -232,73 +167,6 @@ const Jobs = () => {
             </tr>
           )}
         />
-      )}
-
-      {showCreateModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="modal-card modal-medium" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">Create New Job</h2>
-              <button className="modal-close-btn" onClick={() => setShowCreateModal(false)}>
-                <IoCloseOutline size={24} />
-              </button>
-            </div>
-            <div className="modal-body">
-              <Input
-                label="Job Title *"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                placeholder="e.g., Electrician Helper Needed"
-              />
-              <div className="form-group">
-                <label>Job Category *</label>
-                <select
-                  className="input-field"
-                  value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
-                >
-                  <option value="Construction">Construction</option>
-                  <option value="Farming">Farming</option>
-                  <option value="Cleaning">Cleaning</option>
-                  <option value="Housekeeping">Housekeeping</option>
-                  <option value="Electrician">Electrician</option>
-                  <option value="Plumber">Plumber</option>
-                  <option value="Carpenter">Carpenter</option>
-                  <option value="Mechanic">Mechanic</option>
-                </select>
-              </div>
-              <Input
-                label="Location *"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="e.g., Srikakulam, Andhra Pradesh"
-              />
-              <Input
-                label="Salary per Day *"
-                value={formData.salary}
-                onChange={(e) => handleInputChange('salary', e.target.value)}
-                placeholder="e.g., ₹500/day"
-              />
-              <div className="form-group">
-                <label>Experience Level</label>
-                <select
-                  className="input-field"
-                  value={formData.experienceLevel}
-                  onChange={(e) => handleInputChange('experienceLevel', e.target.value)}
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="expert">Expert</option>
-                  <option value="any">Any</option>
-                </select>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <Button variant="secondary" onClick={() => setShowCreateModal(false)}>Cancel</Button>
-              <Button variant="primary" onClick={handleCreateJob}>Post Job</Button>
-            </div>
-          </div>
-        </div>
       )}
 
       <ConfirmationModal 

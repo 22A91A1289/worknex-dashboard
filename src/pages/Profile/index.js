@@ -11,6 +11,7 @@ import {
 } from 'react-icons/io5';
 import './Profile.scss';
 import { api } from '../../services/api';
+import Loader from '../../components/ui/Loader';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
@@ -248,47 +249,8 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="profile-page">
-        <div className="loading-container" style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <div className="spinner" style={{ 
-            border: '4px solid #f3f4f6',
-            borderTop: '4px solid #4F46E5',
-            borderRadius: '50%',
-            width: '60px',
-            height: '60px',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 20px'
-          }}></div>
-          <p style={{ color: '#6B7280', fontSize: '16px', marginBottom: '8px' }}>
-            Loading profile...
-          </p>
-          <p style={{ color: '#9CA3AF', fontSize: '14px' }}>
-            This may take a few seconds
-          </p>
-          <div style={{ 
-            marginTop: '30px', 
-            padding: '20px', 
-            backgroundColor: '#FEF3C7', 
-            borderRadius: '8px',
-            maxWidth: '500px',
-            margin: '30px auto'
-          }}>
-            <p style={{ color: '#92400E', fontSize: '14px', margin: 0 }}>
-              <strong>⚠️ If loading takes too long:</strong><br/>
-              Backend server might not be running.<br/>
-              <code style={{ 
-                display: 'block', 
-                marginTop: '10px', 
-                padding: '10px', 
-                backgroundColor: '#FFF', 
-                borderRadius: '4px',
-                fontSize: '12px'
-              }}>
-                cd backend && npm start
-              </code>
-            </p>
-          </div>
-        </div>
+      <div className="profile-page page-container">
+        <Loader fullPage message="Loading your profile..." />
       </div>
     );
   }

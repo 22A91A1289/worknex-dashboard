@@ -280,6 +280,7 @@
 
 // export default Dashboard;
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IoBriefcaseOutline, IoPeopleOutline } from 'react-icons/io5';
 import './Dashboard.scss';
 import { api } from '../../services/api';
@@ -287,8 +288,10 @@ import { useSocket } from '../../hooks/useSocket';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
 import Table from '../../components/ui/Table';
+import Loader from '../../components/ui/Loader';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState([
     { label: 'Active Jobs', value: '0', icon: IoBriefcaseOutline, color: '#4F46E5' },
     { label: 'Applications', value: '0', icon: IoPeopleOutline, color: '#10B981' },
@@ -439,17 +442,15 @@ const Dashboard = () => {
             <h2 style={{ fontSize: '1.125rem', fontWeight: '600' }}>Internal Postings</h2>
             <p style={{ fontSize: '0.875rem', color: '#6B7280' }}>Your 5 most recent active jobs</p>
           </div>
-          <Button variant="outline" className="btn-small" onClick={() => window.location.href = '/jobs'}>View All</Button>
+          <Button variant="outline" className="btn-small" onClick={() => navigate('/jobs')}>View All</Button>
         </div>
 
         {loading ? (
-          <div className="loading-state">
-            <p>Loading your dashboard...</p>
-          </div>
+          <Loader message="Loading your dashboard..." />
         ) : recentJobs.length === 0 ? (
           <div className="empty-state">
             <p>No active jobs found. Start by posting one!</p>
-            <Button variant="primary" style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/jobs'}>Post a Job</Button>
+            <Button variant="primary" style={{ marginTop: '1rem' }} onClick={() => navigate('/jobs/create')}>Post a Job</Button>
           </div>
         ) : (
           <Table 
@@ -470,7 +471,7 @@ const Dashboard = () => {
                   </span>
                 </td>
                 <td>
-                  <Button variant="outline" className="btn-small" onClick={() => window.location.href = `/applications?jobId=${job.id}`}>
+                  <Button variant="outline" className="btn-small" onClick={() => navigate(`/applications?jobId=${job.id}`)}>
                     Details
                   </Button>
                 </td>

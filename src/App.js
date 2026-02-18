@@ -3,8 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.scss';
 import Dashboard from './pages/Dashboard';
 import Jobs from './pages/Jobs';
+import CreateJob from './pages/Jobs/CreateJob';
 import Applications from './pages/Applications';
+import RateWorker from './pages/Applications/RateWorker';
 import Payments from './pages/Payments';
+import PaymentProcess from './pages/Payments/PaymentProcess';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
@@ -43,8 +46,11 @@ function AppRoutes() {
         <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="jobs" element={<Jobs />} />
+            <Route path="jobs/create" element={<CreateJob />} />
             <Route path="applications" element={<Applications />} />
+            <Route path="applications/rate/:id" element={<RateWorker />} />
             <Route path="payments" element={<Payments />} />
+            <Route path="payments/process/:id" element={<PaymentProcess />} />
             <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
